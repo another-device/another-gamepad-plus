@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnotherGamepadPlus"
         mc:Ignorable="d"
-        Title="Another-Gamepad-Plus" Height="450" Width="500"
+        Title="Another-Gamepad-Plus" Height="466" Width="500"
         Closing="Window_Closing"
         ResizeMode="NoResize">
     <Grid Margin="10">
@@ -72,14 +72,15 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- 左摇杆 -->
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Left Joystick:" FontWeight="Bold"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Joystick:" FontWeight="Bold"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="Controls mouse movement"/>
 
                 <!-- A键/L键 -->
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="A Button / L Button:" FontWeight="Bold"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="A Button / Press Joystick:" FontWeight="Bold"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="Left mouse click"/>
 
                 <!-- B键 -->
@@ -109,6 +110,10 @@
                 <!-- Start + Back 键 -->
                 <TextBlock Grid.Row="8" Grid.Column="0" Text="Back Button + Start Button:" FontWeight="Bold"/>
                 <TextBlock Grid.Row="8" Grid.Column="1" Text="Pause / Resume"/>
+
+                <!-- 十字键 -->
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="DPad" FontWeight="Bold"/>
+                <TextBlock Grid.Row="9" Grid.Column="1" Text="Arrow Keys"/>
             </Grid>
         </GroupBox>
 

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using AnotherGamepadPlus.Helpers;
 using AnotherGamepadPlus.Services;
@@ -13,6 +14,7 @@ namespace AnotherGamepadPlus.Views
 
         private readonly ControllerService _controllerService;
         private readonly MouseService _mouseService;
+        private readonly KeyboardService _keyboardService;
         private readonly ScreenService _screenService;
         private readonly DispatcherTimer _mousePositionTimer;
 
@@ -42,6 +44,7 @@ namespace AnotherGamepadPlus.Views
             // 初始化服务
             _screenService = new ScreenService();
             _mouseService = new MouseService(_screenService);
+            _keyboardService = new KeyboardService();
             _controllerService = new ControllerService();
 
             // 初始化定时器用于更新鼠标位置显示
@@ -241,7 +244,7 @@ namespace AnotherGamepadPlus.Views
             };
 
             // 摇杆移动
-            _controllerService.LeftStickMoved += (x, y) =>
+            _controllerService.StickMoved += (x, y) =>
             {
                 Dispatcher.InvokeAsync(() =>
                 {
@@ -306,6 +309,21 @@ namespace AnotherGamepadPlus.Views
                 });
             };
 
+            // R键 (左键)
+            _controllerService.RButtonStateChanged += (pressed) =>
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    if (!isPaused)
+                    {
+                        if (pressed)
+                            MouseService.LeftButtonDown();
+                        else
+                            MouseService.LeftButtonUp();
+                    }
+                });
+            };
+
             // B键 (右键)
             _controllerService.BButtonStateChanged += (pressed) =>
             {
@@ -357,6 +375,60 @@ namespace AnotherGamepadPlus.Views
                         _mouseService.SensitivityFactor = 3f;
                     else
                         _mouseService.SensitivityFactor = 1f;
+                });
+            };
+
+            // DPad
+            _controllerService.DPadLeftStateChanged += (pressed) =>
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    if (!isPaused)
+                    {
+                        if (pressed)
+                            KeyboardService.PressLeft();
+                        else
+                            KeyboardService.ReleaseLeft();
+                    }
+                });
+            };
+            _controllerService.DPadRightStateChanged += (pressed) =>
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    if (!isPaused)
+                    {
+                        if (pressed)
+                            KeyboardService.PressRight();
+                        else
+                            KeyboardService.ReleaseRight();
+                    }
+                });
+            };
+            _controllerService.DPadUpStateChanged += (pressed) =>
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    if (!isPaused)
+                    {
+                        if (pressed)
+                            KeyboardService.PressUp();
+                        else
+                            KeyboardService.ReleaseUp();
+                    }
+                });
+            };
+            _controllerService.DPadDownStateChanged += (pressed) =>
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    if (!isPaused)
+                    {
+                        if (pressed)
+                            KeyboardService.PressDown();
+                        else
+                            KeyboardService.ReleaseDown();
+                    }
                 });
             };
 

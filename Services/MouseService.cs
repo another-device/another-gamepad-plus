@@ -70,7 +70,7 @@ namespace AnotherGamepadPlus.Services
                 new INPUT
                 {
                     type = InputType.INPUT_MOUSE,
-                    mi = new MouseInputUnion
+                    mi = new InputUnion
                     {
                         mi = new MOUSEINPUT
                         {

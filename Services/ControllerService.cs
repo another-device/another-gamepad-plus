@@ -12,7 +12,7 @@ namespace AnotherGamepadPlus.Services
 
         // 事件定义
         public event Action<bool> ConnectionStatusChanged;
-        public event Action<float, float> LeftStickMoved;
+        public event Action<float, float> StickMoved;
         public event Action<byte> LeftTriggerChanged;
         public event Action<byte> RightTriggerChanged;
         public event Action<bool> StartButtonStateChanged;
@@ -24,6 +24,11 @@ namespace AnotherGamepadPlus.Services
         public event Action<bool> LBStateChanged;
         public event Action<bool> RBStateChanged;
         public event Action<bool> LButtonStateChanged;
+        public event Action<bool> RButtonStateChanged;
+        public event Action<bool> DPadUpStateChanged;
+        public event Action<bool> DPadDownStateChanged;
+        public event Action<bool> DPadLeftStateChanged;
+        public event Action<bool> DPadRightStateChanged;
 
         // 状态跟踪
         private bool _isConnected;
@@ -35,6 +40,11 @@ namespace AnotherGamepadPlus.Services
         private bool _lbPressed;
         private bool _rbPressed;
         private bool _lButtonPressed;
+        private bool _rButtonPressed;
+        private bool _dPadUpPressed;
+        private bool _dPadDownPressed;
+        private bool _dPadLeftPressed;
+        private bool _dPadRightPressed;
 
         public void StartMonitoring()
         {
@@ -96,7 +106,12 @@ namespace AnotherGamepadPlus.Services
                     // 处理左摇杆
                     var lx = NormalizeThumbValue(state.Gamepad.sThumbLX);
                     var ly = NormalizeThumbValue(state.Gamepad.sThumbLY);
-                    LeftStickMoved?.Invoke(lx, ly);
+                    StickMoved?.Invoke(lx, ly);
+
+                    // 处理右摇杆
+                    var rx = NormalizeThumbValue(state.Gamepad.sThumbRX);
+                    var ry = NormalizeThumbValue(state.Gamepad.sThumbRY);
+                    StickMoved?.Invoke(rx, ry);
 
                     // 处理扳机键
                     LeftTriggerChanged?.Invoke(state.Gamepad.bLeftTrigger);
@@ -165,6 +180,40 @@ namespace AnotherGamepadPlus.Services
                     {
                         _lButtonPressed = lButtonPressed;
                         LButtonStateChanged?.Invoke(lButtonPressed);
+                    }
+
+                    // 处理R按钮
+                    var rButtonPressed = (state.Gamepad.wButtons & Constants.XINPUT_GAMEPAD_RIGHT_THUMB) != 0;
+                    if (rButtonPressed != _rButtonPressed)
+                    {
+                        _rButtonPressed = rButtonPressed;
+                        RButtonStateChanged?.Invoke(rButtonPressed);
+                    }
+
+                    // 处理DPad按钮
+                    var dpadUpPressed = (state.Gamepad.wButtons & Constants.XINPUT_GAMEPAD_DPAD_UP) != 0;
+                    if (dpadUpPressed != _dPadUpPressed)
+                    {
+                        _dPadUpPressed = dpadUpPressed;
+                        DPadUpStateChanged?.Invoke(dpadUpPressed);
+                    }
+                    var dpadDownPressed = (state.Gamepad.wButtons & Constants.XINPUT_GAMEPAD_DPAD_DOWN) != 0;
+                    if (dpadDownPressed != _dPadDownPressed)
+                    {
+                        _dPadDownPressed = dpadDownPressed;
+                        DPadDownStateChanged?.Invoke(dpadDownPressed);
+                    }
+                    var dpadLeftPressed = (state.Gamepad.wButtons & Constants.XINPUT_GAMEPAD_DPAD_LEFT) != 0;
+                    if (dpadLeftPressed != _dPadLeftPressed)
+                    {
+                        _dPadLeftPressed = dpadLeftPressed;
+                        DPadLeftStateChanged?.Invoke(dpadLeftPressed);
+                    }
+                    var dpadRightPressed = (state.Gamepad.wButtons & Constants.XINPUT_GAMEPAD_DPAD_RIGHT) != 0;
+                    if (dpadRightPressed != _dPadRightPressed)
+                    {
+                        _dPadRightPressed = dpadRightPressed;
+                        DPadRightStateChanged?.Invoke(dpadRightPressed);
                     }
                 }
 

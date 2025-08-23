@@ -42,20 +42,33 @@ namespace AnotherGamepadPlus.Helpers
         MOUSEEVENTF_ABSOLUTE = 0x8000
     }
 
+    // 键盘事件标志
+    [Flags]
+    internal enum KeyboardEventFlags : uint
+    {
+        KEYEVENTF_KEYDOWN = 0x0000,
+        KEYEVENTF_EXTENDEDKEY = 0x0001,
+        KEYEVENTF_KEYUP = 0x0002,
+        KEYEVENTF_UNICODE = 0x0004,
+        KEYEVENTF_SCANCODE = 0x0008
+    }
+
     // 输入事件结构体
     [StructLayout(LayoutKind.Sequential)]
     internal struct INPUT
     {
         public InputType type;
-        public MouseInputUnion mi;
+        public InputUnion mi;
     }
 
     // 鼠标输入联合体
     [StructLayout(LayoutKind.Explicit)]
-    internal struct MouseInputUnion
+    internal struct InputUnion
     {
         [FieldOffset(0)]
         public MOUSEINPUT mi;
+        [FieldOffset(0)]
+        public KEYBDINPUT ki;
     }
 
     // 鼠标输入结构体
@@ -68,6 +81,17 @@ namespace AnotherGamepadPlus.Helpers
         public MouseEventFlags dwFlags;
         public uint time;
         public UIntPtr dwExtraInfo;
+    }
+
+    // 键盘输入结构体
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct KEYBDINPUT
+    {
+        public ushort wVk;          // 虚拟按键码
+        public ushort wScan;        // 扫描码
+        public KeyboardEventFlags dwFlags; // 按键标志
+        public uint time;           // 时间戳
+        public UIntPtr dwExtraInfo; // 额外信息
     }
 
     // XInput结构体定义
