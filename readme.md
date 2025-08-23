@@ -12,9 +12,9 @@ Another-Gamepad-Plus is a tool designed to bridge your gamepad and mouse functio
 
 ### Basic Controls
 
-- **Left Joystick**: Controls mouse movement
+- **Joystick**: Controls mouse movement
 
-- **A Button / L Button**: Left mouse click
+- **A Button / Press Joystick**: Left mouse click
 
 - **B Button**: Right mouse click
 
@@ -30,6 +30,8 @@ Another-Gamepad-Plus is a tool designed to bridge your gamepad and mouse functio
 
 - **Back Button + Start Button**: Pause / Resume
 
+- **DPad**: Arrow Keys
+
 ### Customization
 
 The tool supports adjustments for:
@@ -42,15 +44,11 @@ The tool supports adjustments for:
 
 The repository includes the following key directories and files for development and deployment:
 
-- `.vscode`: Configuration files for Visual Studio Code.
-
 - `Helpers`: Utility classes and helper functions.
 
 - `Services`: Core service implementations for input handling.
 
 - `Views`: UI components and layout files.
-
-- `publish.ps1`: PowerShell script for project deployment.
 
 - `agp.csproj` / `agp.sln`: Project and solution files for build management.
 
