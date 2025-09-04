@@ -9,6 +9,7 @@ namespace AnotherGamepadPlus.Services
         private readonly SettingService _settingService;
         private Settings _settings;
         private float _sensitivity_factor = 1.0f;
+        private Tuple<float, float> _mouse_move_buffer = new(0f, 0f);
 
         public float Sensitivity
         {
@@ -55,9 +56,20 @@ namespace AnotherGamepadPlus.Services
             xDelta = xDelta / magnitude * scale;
             yDelta = yDelta / magnitude * scale;
 
+            _mouse_move_buffer = new Tuple<float, float>(
+                _mouse_move_buffer.Item1 + (xDelta * Sensitivity * SensitivityFactor),
+                _mouse_move_buffer.Item2 + (yDelta * Sensitivity * SensitivityFactor)
+            );
+
             var currentPos = Cursor.Position;
-            int newX = currentPos.X + (int)(xDelta * Sensitivity * SensitivityFactor);
-            int newY = currentPos.Y - (int)(yDelta * Sensitivity * SensitivityFactor);
+            int newX = currentPos.X + (int)_mouse_move_buffer.Item1;
+            int newY = currentPos.Y - (int)_mouse_move_buffer.Item2;
+
+            _mouse_move_buffer = new Tuple<float, float>(
+                _mouse_move_buffer.Item1 - (int)_mouse_move_buffer.Item1,
+                _mouse_move_buffer.Item2 - (int)_mouse_move_buffer.Item2
+            );
+
             var adjustedPos = _screenService.AdjustPositionToScreens(new Point(newX, newY));
             NativeMethods.SetCursorPos(adjustedPos.X, adjustedPos.Y);
         }

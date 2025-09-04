@@ -8,7 +8,7 @@ namespace AnotherGamepadPlus.Helpers
         // 在这里统一修改版本号
         public const string Major = "1";
         public const string Minor = "1";
-        public const string Patch = "0";
+        public const string Patch = "1";
 
         /// <summary>
         /// 完整版本号（格式：主版本.次版本.修订号）
