@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using AnotherGamepadPlus.Helpers;
@@ -17,6 +17,7 @@ namespace AnotherGamepadPlus.Views
         private readonly KeyboardService _keyboardService;
         private readonly ScreenService _screenService;
         private readonly DispatcherTimer _mousePositionTimer;
+        private readonly LuaScriptService _luaService;
 
         private readonly NotifyIcon _notifyIcon;
 
@@ -46,6 +47,7 @@ namespace AnotherGamepadPlus.Views
             _mouseService = new MouseService(_screenService);
             _keyboardService = new KeyboardService();
             _controllerService = new ControllerService();
+            _luaService = new LuaScriptService(_mouseService, _keyboardService, _controllerService);
 
             // 初始化定时器用于更新鼠标位置显示
             _mousePositionTimer = new DispatcherTimer
@@ -64,7 +66,6 @@ namespace AnotherGamepadPlus.Views
             // 绑定设置到UI控件
             BindSettingsToControls();
         }
-
 
         private void BindSettingsToControls()
         {
@@ -97,6 +98,17 @@ namespace AnotherGamepadPlus.Views
             var exitItem = new ToolStripMenuItem("Exit");
             exitItem.Click += ExitItem_Click;
             contextMenu.Items.Add(exitItem);
+
+            // 添加"重新加载Lua脚本"菜单项
+            var reloadLua = new ToolStripMenuItem("Reload Lua Script");
+            reloadLua.Click += (object sender, EventArgs e) =>
+            {
+                if (_luaService.LoadScript())
+                {
+                    _notifyIcon.ShowBalloonTip(0, "AGP", "Script is reloaded successfully.", ToolTipIcon.None);
+                }
+            };
+            contextMenu.Items.Add(reloadLua);
 
             // 关联右键菜单
             _notifyIcon.ContextMenuStrip = contextMenu;
@@ -249,7 +261,8 @@ namespace AnotherGamepadPlus.Views
                 Dispatcher.InvokeAsync(() =>
                 {
                     if (!isPaused)
-                        _mouseService.MoveMouse(x, y);
+                        if (_luaService.InvokeStickCallback(x, y)) return;
+                    _mouseService.MoveMouse(x, y);
                 });
             };
 
@@ -262,7 +275,8 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused && value > triggerThreshold)
                     {
-                        MouseService.ScrollWheel((int)MathTool.MapValueClamped(value - triggerThreshold, triggerThreshold, 255f, 0f, 80f)); // 上滚
+                        if (_luaService.InvokeTriggerCallback("OnLeftTrigger", value)) return;
+                        MouseService.ScrollWheel((int)MathTool.MapValueClamped(value, triggerThreshold, 255f, 0f, 20f)); // 上滚
                     }
                 });
             };
@@ -274,7 +288,8 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused && value > triggerThreshold)
                     {
-                        MouseService.ScrollWheel(-(int)MathTool.MapValueClamped(value - triggerThreshold, triggerThreshold, 255f, 0f, 80f)); // 下滚
+                        if (_luaService.InvokeTriggerCallback("OnRightTrigger", value)) return;
+                        MouseService.ScrollWheel(-(int)MathTool.MapValueClamped(value, triggerThreshold, 255f, 0f, 20f)); // 下滚
                     }
                 });
             };
@@ -286,6 +301,7 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnAButton", pressed)) return;
                         if (pressed)
                             MouseService.LeftButtonDown();
                         else
@@ -301,6 +317,7 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnLButton", pressed)) return;
                         if (pressed)
                             MouseService.LeftButtonDown();
                         else
@@ -316,6 +333,7 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnRButton", pressed)) return;
                         if (pressed)
                             MouseService.LeftButtonDown();
                         else
@@ -331,6 +349,7 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnBButton", pressed)) return;
                         if (pressed)
                             MouseService.RightButtonDown();
                         else
@@ -346,10 +365,23 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnXButton", pressed)) return;
                         if (pressed)
                             MouseService.MiddleButtonDown();
                         else
                             MouseService.MiddleButtonUp();
+                    }
+                });
+            };
+
+            // Y键 (保留)
+            _controllerService.YButtonStateChanged += (pressed) =>
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    if (!isPaused)
+                    {
+                        if (_luaService.InvokeButtonCallback("OnYButton", pressed)) return;
                     }
                 });
             };
@@ -359,6 +391,7 @@ namespace AnotherGamepadPlus.Views
             {
                 Dispatcher.InvokeAsync(() =>
                 {
+                    if (_luaService.InvokeButtonCallback("OnLBButton", pressed)) return;
                     if (pressed)
                         _mouseService.SensitivityFactor = 1 / 3f;
                     else
@@ -371,6 +404,7 @@ namespace AnotherGamepadPlus.Views
             {
                 Dispatcher.InvokeAsync(() =>
                 {
+                    if (_luaService.InvokeButtonCallback("OnRBButton", pressed)) return;
                     if (pressed)
                         _mouseService.SensitivityFactor = 3f;
                     else
@@ -385,10 +419,11 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnDPadLeftButton", pressed)) return;
                         if (pressed)
-                            KeyboardService.PressLeft();
+                            _keyboardService.PressLeft();
                         else
-                            KeyboardService.ReleaseLeft();
+                            _keyboardService.ReleaseLeft();
                     }
                 });
             };
@@ -398,10 +433,11 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnDPadRightButton", pressed)) return;
                         if (pressed)
-                            KeyboardService.PressRight();
+                            _keyboardService.PressRight();
                         else
-                            KeyboardService.ReleaseRight();
+                            _keyboardService.ReleaseRight();
                     }
                 });
             };
@@ -411,10 +447,11 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnDPadUpButton", pressed)) return;
                         if (pressed)
-                            KeyboardService.PressUp();
+                            _keyboardService.PressUp();
                         else
-                            KeyboardService.ReleaseUp();
+                            _keyboardService.ReleaseUp();
                     }
                 });
             };
@@ -424,10 +461,11 @@ namespace AnotherGamepadPlus.Views
                 {
                     if (!isPaused)
                     {
+                        if (_luaService.InvokeButtonCallback("OnDPadDownButton", pressed)) return;
                         if (pressed)
-                            KeyboardService.PressDown();
+                            _keyboardService.PressDown();
                         else
-                            KeyboardService.ReleaseDown();
+                            _keyboardService.ReleaseDown();
                     }
                 });
             };

@@ -13,5 +13,8 @@
     <!-- 定义资源文件 -->
     <Resource Include="Resources\agp.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NLua" Version="1.7.5" />
+  </ItemGroup>
 
 </Project>

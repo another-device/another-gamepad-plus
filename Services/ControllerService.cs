@@ -20,7 +20,7 @@ namespace AnotherGamepadPlus.Services
         public event Action<bool> AButtonStateChanged;
         public event Action<bool> BButtonStateChanged;
         public event Action<bool> XButtonStateChanged;
-        // public event Action<bool> YButtonStateChanged;
+        public event Action<bool> YButtonStateChanged;
         public event Action<bool> LBStateChanged;
         public event Action<bool> RBStateChanged;
         public event Action<bool> LButtonStateChanged;
@@ -37,6 +37,7 @@ namespace AnotherGamepadPlus.Services
         private bool _aButtonPressed;
         private bool _bButtonPressed;
         private bool _xButtonPressed;
+        private bool _yButtonPressed;
         private bool _lbPressed;
         private bool _rbPressed;
         private bool _lButtonPressed;
@@ -157,6 +158,15 @@ namespace AnotherGamepadPlus.Services
                         _xButtonPressed = xPressed;
                         XButtonStateChanged?.Invoke(xPressed);
                     }
+
+                    // 处理Y按钮
+                    var yPressed = (state.Gamepad.wButtons & Constants.XINPUT_GAMEPAD_Y) != 0;
+                    if (yPressed != _yButtonPressed)
+                    {
+                        _yButtonPressed = yPressed;
+                        YButtonStateChanged?.Invoke(yPressed);
+                    }
+
 
                     // 处理LB按钮
                     var lbPressed = (state.Gamepad.wButtons & Constants.XINPUT_GAMEPAD_LEFT_SHOULDER) != 0;

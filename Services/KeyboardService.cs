@@ -29,35 +29,45 @@ namespace AnotherGamepadPlus.Services
             NativeMethods.SendInput((uint)input.Length, input, Marshal.SizeOf(typeof(INPUT)));
         }
 
-        public static void PressUp()
+        public void PressKey(ushort keyCode)
+        {
+            SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYDOWN, keyCode);
+        }
+        public void ReleaseKey(ushort keyCode)
+        {
+            SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYUP, keyCode);
+        }
+
+
+        public void PressUp()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYDOWN, 0x26);
         }
-        public static void ReleaseUp()
+        public void ReleaseUp()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYUP, 0x26);
         }
-        public static void PressDown()
+        public void PressDown()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYDOWN, 0x28);
         }
-        public static void ReleaseDown()
+        public void ReleaseDown()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYUP, 0x28);
         }
-        public static void PressLeft()
+        public void PressLeft()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYDOWN, 0x25);
         }
-        public static void ReleaseLeft()
+        public void ReleaseLeft()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYUP, 0x25);
         }
-        public static void PressRight()
+        public void PressRight()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYDOWN, 0x27);
         }
-        public static void ReleaseRight()
+        public void ReleaseRight()
         {
             SendKeyboardInput(KeyboardEventFlags.KEYEVENTF_KEYUP, 0x27);
         }
